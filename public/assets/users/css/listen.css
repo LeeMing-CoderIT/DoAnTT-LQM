@@ -1,0 +1,91 @@
+.item-content{
+    display: block; padding: 10px 5px;
+}
+.item-content.context-menu{
+    background: rgb(124, 165, 255);
+}
+.item-content.active{
+    background: rgb(18, 93, 255);
+}
+
+.box-controls{
+    background: rgb(158, 158, 158); z-index: 500;
+}
+.number-range{
+    margin-top: -5px;
+}
+.btn-controll{
+    height: 30px; width: 30px; border-radius: 50%; border: none; position: relative; background: black;
+    color: white; display: flex; justify-content: center; align-items: center;
+}
+.btn-controll.disabled{
+    opacity: 0.6; pointer-events: none;
+}
+.btn-controll:active{
+    opacity: 0.8;
+}
+#btn-play{
+    height: 40px; width: 40px; font-size: 25px;
+}
+#btn-play::after{
+    content: "\f04b"; font-family: "FontAwesome"; position: absolute; translate: -35% -50%; 
+    top: 50%; left: 50%; z-index: 1;
+}
+#btn-play.playing::after{
+    content: "\f04c"; translate: -50% -50%; 
+}
+#btn-play.disabled{
+    pointer-events: none;
+}
+#btn-play.disabled::after{
+    content: "\f110"; translate: -50% -50%; animation: xoay 1s linear infinite;
+}
+@keyframes xoay {
+    from { rotate: 0deg; } to{rotate: 360deg;}
+}
+#btn-list-chapters{
+    position: absolute; right: 20px; top: 20px; scale: 1.5;
+}
+.box-list-chapters{
+    position: fixed; z-index: 10001; width: 100%; height: 100%; top: 0; right: -100%; transition: all 0.5s ease-out;
+}
+.box-list-chapters .btn-close{
+    color: white; font-size: 24px; display: flex; align-items: center; justify-content: center; height: 40px;
+}
+.box-list-chapters ul{
+    position: relative; overflow-y: auto;
+    height: calc(100% - 50px); list-style: none; padding: 0; margin: 0;
+}
+.box-list-chapters ul li{
+    color: white; padding-left: 40px; cursor: pointer; line-height: 30px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; 
+}
+.box-list-chapters ul li::after{
+    content: "\f04b"; font-family: "FontAwesome"; position: absolute; left: 15px; translate: 0 -2px;
+}
+.box-list-chapters ul li.playing::after{
+    content: "\f04c";
+}
+#options-contextmenu{
+    position: absolute; top: 0; left: 0; list-style: none; width: 150px; background: rgb(32, 32, 32);
+    color: white; margin: 0; padding: 0; overflow: hidden; border-radius: 5px;
+}
+#options-contextmenu li{
+    padding: 5px 10px; cursor: pointer;
+}
+#options-contextmenu li:hover{
+    background: rgb(65, 41, 41);
+}
+#setting-speech{
+    position: fixed; top: 50%; left: 50%; translate: -50% -80%; background: white; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; padding: 20px; border-radius: 10px;
+    box-shadow: 0 0 5px 5px rgb(187, 187, 187);
+}
+.number-speech{
+    position: absolute; top: 50%;
+}
+.number-speech:first-child{
+    left: 0px;
+}
+.number-speech:last-child{
+    right: 5px;
+}

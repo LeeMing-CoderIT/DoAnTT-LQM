@@ -1,0 +1,2 @@
+<a href="javascript:void(0)" class="btn btn-warning" title="Cập nhật" data-toggle="modal" data-target="#modal-xl" onclick="editData({{$id}});"><i class="fas fa-edit"></i></a>
+<a href="javascript:void(0)" class="btn btn-danger" title="Xóa" onclick="deleteData({{$id}});"><i class="fas fa-trash-alt"></i></a>
