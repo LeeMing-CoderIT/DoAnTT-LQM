@@ -61,7 +61,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label"><strong>Ảnh đại diện:</strong>                            
-                            <img src="storage/images/users/{{Auth::user()->avatar}}" alt="<trống>" data-old="{{Auth::user()->avatar}}" style="width: 50px; height: 50px; border-radius: 50%;">
+                            <img src="{{Auth::user()->avatar}}" alt="<trống>" data-old="{{Auth::user()->avatar}}" style="width: 50px; height: 50px; border-radius: 50%;">
                         </label>
                         <input class="form-control d-none" name="avatar" type="file" id="info-avatar" value="{{Auth::user()->avatar}}" title="Ảnh đại diện" placeholder="Chọn ảnh đại diện">
                     </div>
@@ -134,7 +134,7 @@
                                 <th>Số lượng chương</th>
                                 <th>Thể loại</th>
                                 <th>Trạng thái</th>
-                                <th>Tùy biến</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -147,7 +147,7 @@
                                 <th>Số lượng chương</th>
                                 <th>Thể loại</th>
                                 <th>Trạng thái</th>
-                                <th>Tùy biến</th>
+                                <th></th>
                             </tr>
                         </tfoot>
                     </table>
@@ -267,7 +267,7 @@
         $('#btn-open-info').removeClass('d-none');
         $('#btn-edit-info').addClass('d-none');
         $('#btn-reset-info').addClass('d-none');
-        $('#form-info img').attr('src', 'storage/images/users/'+$('#form-info img').attr('data-old'));
+        $('#form-info img').attr('src', $('#form-info img').attr('data-old'));
     });
     $('#info-avatar').change(function (e) { 
         e.preventDefault();
@@ -446,17 +446,17 @@
             responsive: true,
             language: {
                 "decimal":        "",
-                "emptyTable":     "Không có yêu cầu nào",
-                "info":           "Từ _START_ dến _END_ của _TOTAL_ yêu cầu tìm được",
-                "infoEmpty":      "Không có yêu cầu phù hợp",
-                "infoFiltered":   "(trong tổng _MAX_ yêu cầu)",
+                "emptyTable":     "Không có truyện nào",
+                "info":           "Từ _START_ dến _END_ của _TOTAL_ truyện tìm được",
+                "infoEmpty":      "Không có truyện phù hợp",
+                "infoFiltered":   "(trong tổng _MAX_ truyện)",
                 "infoPostFix":    "",
                 "thousands":      ",",
-                "lengthMenu":     "Hiển thị _MENU_ yêu cầu",
+                "lengthMenu":     "Hiển thị _MENU_ truyện",
                 "loadingRecords": "Loading...",
                 "processing":     "",
                 "search":         "Tìm kiếm:",
-                "zeroRecords":    "Không có yêu cầu nào",
+                "zeroRecords":    "Không có truyện nào",
                 "paginate": {
                     "first":      "Đầu",
                     "last":       "Cuối",
@@ -500,17 +500,17 @@
             responsive: true,
             language: {
                 "decimal":        "",
-                "emptyTable":     "Không có yêu cầu nào",
-                "info":           "Từ _START_ dến _END_ của _TOTAL_ yêu cầu tìm được",
-                "infoEmpty":      "Không có yêu cầu phù hợp",
-                "infoFiltered":   "(trong tổng _MAX_ yêu cầu)",
+                "emptyTable":     "Không có truyện nào",
+                "info":           "Từ _START_ dến _END_ của _TOTAL_ truyện tìm được",
+                "infoEmpty":      "Không có truyện phù hợp",
+                "infoFiltered":   "(trong tổng _MAX_ truyện)",
                 "infoPostFix":    "",
                 "thousands":      ",",
-                "lengthMenu":     "Hiển thị _MENU_ yêu cầu",
+                "lengthMenu":     "Hiển thị _MENU_ truyện",
                 "loadingRecords": "Loading...",
                 "processing":     "",
                 "search":         "Tìm kiếm:",
-                "zeroRecords":    "Không có yêu cầu nào",
+                "zeroRecords":    "Không có truyện nào",
                 "paginate": {
                     "first":      "Đầu",
                     "last":       "Cuối",
@@ -532,16 +532,42 @@
                 },
             ],
         });
-        $('#example_processing').html('<img src="storage/images/loading.gif" width="80" height="80">');
-        $('#example_processing').css({padding: 0, margin: 0, width: '80px', height: '80px', 
+        $('#example-all-request_processing').html('<img src="storage/images/loading.gif" width="80" height="80">');
+        $('#example-all-request_processing').css({padding: 0, margin: 0, width: '80px', height: '80px', 
+            translate: '-50% -50%', 'border-radius': '50%', 'z-index': 100});
+        $('#example-all-manager_processing').html('<img src="storage/images/loading.gif" width="80" height="80">');
+        $('#example-all-manager_processing').css({padding: 0, margin: 0, width: '80px', height: '80px', 
+            translate: '-50% -50%', 'border-radius': '50%', 'z-index': 100});
+        $('#example-all-history_processing').html('<img src="storage/images/loading.gif" width="80" height="80">');
+        $('#example-all-history_processing').css({padding: 0, margin: 0, width: '80px', height: '80px', 
             translate: '-50% -50%', 'border-radius': '50%', 'z-index': 100});
         setTimeout(function() {
             $('.dark-mode .dropdown-item').css({color: 'black'});
         }, 10);
     });
 
-    function deleteHistory(){
-        
+    function deleteHistory(index){
+        Swal.fire({
+            title: "Bạn có chắc chắn muốn xóa không?",
+            showCancelButton: true,
+            confirmButtonText: "Xác nhận",
+            cancelButtonText: "Hủy",
+            icon: "question",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type: "get",
+                    url: "delete-history",
+                    data: {
+                        index: index
+                    },
+                    success: function (response) {
+                        Swal.fire(response.msg, "", response.type);
+                        // console.log(response);
+                    }   
+                });
+            }
+        });
     }
 </script>
 @endsection

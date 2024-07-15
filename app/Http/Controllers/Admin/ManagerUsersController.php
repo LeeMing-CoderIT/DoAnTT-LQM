@@ -22,6 +22,7 @@ class ManagerUsersController extends Controller
 
     public function index(Request $request)
     {
+        $this->data['title'] = "Quản lý danh sách người dùng";
         $this->data['path_active'] = $request->path();
         return view('admins.users.index', $this->data);
     }
@@ -64,6 +65,7 @@ class ManagerUsersController extends Controller
             return response()->json($user);
         }
         if($user->id != \Auth::user()->id){
+            $this->data['title'] = "Quản lý thông tin người dùng: ".$user->fullname;
             $this->data['user'] = $user;
             return view('admins.users.show', $this->data);
         }else{
@@ -110,6 +112,48 @@ class ManagerUsersController extends Controller
             }
         } catch (\Throwable $th) {
             $response['msg'] = $th; 
+        }
+        return response()->json($response);
+    }
+
+    public function decentralization(Request $request){
+        if($request->ajax()){
+            $users = User::select('*')->where('users.root', '>=', 0)->where('users.id', '<>', \Auth::user()->id)->get();
+            foreach ($users as $key => $value) {
+                $users[$key]->index = $key+1;
+                $users[$key]->decentralization = $value->name_manager();
+            }
+            return (datatables()->of($users)
+            ->addColumn('show', 'admins.users.show-de')
+            ->addColumn('action', 'admins.users.action-de')
+            ->rawColumns(['show','action'])
+            ->addIndexColumn()
+            ->make(true));
+        }
+        $this->data['title'] = "Phân quyền người dùng";
+        $this->data['path_active'] = $request->path();
+        return view('admins.users.decentralization', $this->data);
+    }
+
+    public function changeDecentralization(Request $request, User $user){
+        $response = []; $response['success'] = false; 
+        $response['msg'] = [
+            'type' => 'error',
+            'msg' => 'Cấp quyền thất bại.'
+        ];
+        try {
+            $root = (int)$request->root;
+            if($user->update(['root' => $root])){
+                $response['success'] = true; 
+                $response['msg'] = [
+                    'data' => $user,
+                    'root' => $root,
+                    'type' => 'success',
+                    'msg' => 'Cấp quyền thành công.'
+                ];
+            }
+        } catch (\Throwable $th) {
+
         }
         return response()->json($response);
     }

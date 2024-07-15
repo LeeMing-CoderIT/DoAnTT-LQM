@@ -18,6 +18,7 @@ class UserController extends Controller
     }
     public function login(){
         if(Auth::check()) Auth::logout();
+        $this->data['title'] = "Đăng nhập";
         return view('loginForms.login', $this->data);
     }
 
@@ -49,6 +50,7 @@ class UserController extends Controller
 
     public function register(){
         if(Auth::check()) Auth::logout();
+        $this->data['title'] = "Đăng ký";
         return view('loginForms.register', $this->data);
     }
 
@@ -82,6 +84,7 @@ class UserController extends Controller
 
     public function forgetPassword(){
         if(Auth::check()) Auth::logout();
+        $this->data['title'] = "Quên mật khẩu";
         return view('loginForms.forget_password', $this->data);
     }
 

@@ -32,6 +32,7 @@ class AppController extends Controller
         $this->musty_hot = $this->musty_Hot();
         $this->data['categories'] = Category::all();
         $this->data['languages'] = json_decode(Storage::get('public/files/languages.json'), true);
+        $this->data['lang'] = 'vi';
     }
 
     protected function languageSetup(){
@@ -49,12 +50,13 @@ class AppController extends Controller
     }
 
     public function filter(Request $request){
+        $this->data['title'] = "Lọc truyện theo yêu cầu";
         return view("users.filter", $this->data);
     }
 
     public function category(Request $request){
         $this->data['category_info'] = Category::where("slug", $request->category)->first();
-        // dd($this->data['category_info']->stories());
+        $this->data['title'] = "Danh mục: ".$this->data['category_info']->name;
         return view("users.category", $this->data);
     }
 
@@ -62,6 +64,7 @@ class AppController extends Controller
         $this->data['story_info'] = Story::where("slug", $request->story)->first();
         $this->data['story_info']->infoViews()->addView();
         if($this->data['story_info']){
+            $this->data['title'] = $this->data['story_info']->name;
             return view("users.story", $this->data);
         }else{
             return view("errors.404");
@@ -201,6 +204,7 @@ class AppController extends Controller
 
     public function infoUser(){
         if(Auth::check()){
+            $this->data['title'] = "Thông tin cá nhân";
             $this->languageSetup();
             return view("users.infoUser", $this->data);
         }else{
@@ -300,7 +304,6 @@ class AppController extends Controller
             foreach ($data as $key => $value) {
                 $data[$key]['index'] = $key+1;
             }
-            // dd($data);
             if($request->ajax()){
                 return (datatables()->of($data)
                 ->addColumn('action', 'users.blocks.action-history')
@@ -311,6 +314,21 @@ class AppController extends Controller
             return $data;
         }
         return response()->json($data);
+    }
+
+    public function deleteHistory(Request $request){
+        $response = []; $response['type'] = "error";
+        $response['msg'] = "Lỗi";
+        $index = ((int)$request->index ?? 0)-1;
+        if(Auth::check() && $index >= 0){
+            $history = Auth::user()->showHistory();
+            unset($history[$index]);
+            Auth::user()->settings()->update([
+                'history' => json_encode($history, JSON_UNESCAPED_UNICODE),
+            ]);
+            // dd($history, Auth::user()->showHistory());
+        }   
+        return response()->json($response);
     }
 
     public function postChangePass(Request $request){

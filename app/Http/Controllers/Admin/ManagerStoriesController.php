@@ -23,6 +23,7 @@ class ManagerStoriesController extends Controller
 
     public function index(Request $request)
     {
+        $this->data['title'] = "Quản lý danh sách truyện";
         return view('admins.stories.index', $this->data);
     }
 
@@ -50,6 +51,7 @@ class ManagerStoriesController extends Controller
         if($request->ajax()){
             return response()->json($story);
         }
+        $this->data['title'] = "Quản lý truyện: " . $story->name;
         $this->data['story'] = $story; $this->data['new_chapter'] = $story->newChapter();
         // dd($this->data['story']->source);
         return view('admins.stories.show', $this->data);
@@ -63,8 +65,11 @@ class ManagerStoriesController extends Controller
             if($request->has('source')){
                 $data['source'] = $request->source;
                 $base64Img = file_get_contents($data['image']);
-                Storage::put('public/photos/1/images/'.$data['slug'].'.'.pathinfo($data['image'], PATHINFO_EXTENSION), $base64Img);
-                $data['image'] = '/storage/photos/1/images/'.$data['slug'].'.'.pathinfo($data['image'], PATHINFO_EXTENSION);
+                $ext = pathinfo($data['image'], PATHINFO_EXTENSION) ?? 'jpg';
+                $new_file = $data['slug'].'.'.$ext;
+                $full_path = 'public/photos/1/images/'.$new_file;
+                Storage::put($full_path, $base64Img);
+                $data['image'] = asset('/storage/photos/1/images/'.$new_file);
             }
             $image_render = explode('storage',$data['image']);
             $data['image'] = '/storage'.$image_render[1];
@@ -142,8 +147,8 @@ class ManagerStoriesController extends Controller
 
     public function slugExist(Request $request){
         $success = false;
-        if($request->has('slug')){
-            $success = Story::where('slug', $request->slug)->get()->count() == 0;
+        if($request->has('name') && $request->has('author')){
+            $success = Story::where('name', $request->name)->where('author', $request->author)->get()->count() == 0;
         }
         return response()->json($success);
     }

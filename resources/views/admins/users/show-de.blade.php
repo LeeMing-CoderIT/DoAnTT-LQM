@@ -1,0 +1,1 @@
+<span class="badge bg-primary" style="padding: 5px; font-size: 0.8rem">{{$decentralization}}</span>

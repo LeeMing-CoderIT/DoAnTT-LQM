@@ -19,6 +19,7 @@ class ManagerRequestController extends Controller
 
     public function index(Request $request)
     {
+        $this->data['title'] = "Quản lý danh sách yêu cầu thêm truyện";
         $this->data['path_active'] = $request->path();
         return view('admins.requests.addStory', $this->data);
     }

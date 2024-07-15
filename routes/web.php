@@ -32,6 +32,7 @@ Route::get('test', function () {
 });
 //****************user*************
     Route::get('/crawler', [CrawlDataController::class, "crawler"])->name("crawler");
+    Route::get('/build-slug', [HelpperController::class, "buildSlug"])->name("buildSlug");
 
     Route::get('/', [AppController::class, "home"])->name("home");
     Route::get('/filter-stories', [AppController::class, "filter"])->name("filter");
@@ -66,6 +67,7 @@ Route::get('test', function () {
     Route::get('/email-change-pass/{user}/{token}', [UserController::class, "emailChangePass"])->name('emailChangePass');
     Route::post('/email-change-pass/{user}/{token}', [UserController::class, "postEmailChangePass"])->name('postEmailChangePass');
     Route::get('/change-background/{user}/{background}', [UserController::class, "changBackground"])->name('changBackground');
+    Route::get('/delete-history', [AppController::class, "deleteHistory"])->name('deleteHistory');
 
 Route::middleware('realtimeLogin')->group(function(){
     //**************checkurl**************
@@ -84,6 +86,8 @@ Route::middleware('realtimeLogin')->group(function(){
                 \UniSharp\LaravelFilemanager\Lfm::routes();
             });
             Route::get('/', [AdminController::class, "home"])->name("home");
+            Route::post('/change-website', [AdminController::class, "changeWebsite"])->name("changeWebsite");
+            
             Route::get('/info', [AdminController::class, "info"])->name("info");
             Route::prefix('/system')->name('system.')->group(function (){
                 Route::get('/', [AdminController::class, "system"])->name("index");
@@ -106,7 +110,6 @@ Route::middleware('realtimeLogin')->group(function(){
                 Route::get('/show/{story}', [ManagerStoriesController::class, "show"])->name("show");
                 Route::patch('/edit/{story}', [ManagerStoriesController::class, "edit"])->name("edit");
                 Route::delete('/delete/{story}', [ManagerStoriesController::class, "delete"])->name("delete");
-                // Route::get('/crawler-data', [ManagerStoriesController::class, "crawler"])->name("crawler");
 
                 Route::prefix('/{story}/chapters')->name('chapters.')->group(function (){
                     Route::get('/all', [ManagerChaptersController::class, "all"])->name("all");
@@ -130,6 +133,9 @@ Route::middleware('realtimeLogin')->group(function(){
                 Route::get('/show/{user}', [ManagerUsersController::class, "show"])->name("show");
                 Route::patch('/edit/{user}', [ManagerUsersController::class, "edit"])->name("edit");
                 Route::delete('/delete/{user}', [ManagerUsersController::class, "delete"])->name("delete");
+                
+                Route::get('/manager-decentralization', [ManagerUsersController::class, "decentralization"])->name("decentralization");
+                Route::patch('/change-decentralization/{user}', [ManagerUsersController::class, "changeDecentralization"])->name("changeDecentralization");
             });
         });
     });

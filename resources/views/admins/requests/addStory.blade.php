@@ -158,11 +158,11 @@
                                 <table id="example" class="table table-bordered table-striped">
                                     <thead>
                                         <tr>
-                                            <th>#</th>
-                                            <th>Người yêu cầu</th>
-                                            <th>Nguồn truyện</th>
-                                            <th>Đường dẫn</th>
-                                            <th>Tùy biến</th>
+                                            <th style="width: 5%;">#</th>
+                                            <th style="width: 20%;">Người yêu cầu</th>
+                                            <th style="width: 20%;">Nguồn truyện</th>
+                                            <th style="width: 20%;">Đường dẫn</th>
+                                            <th style="width: 10%;">Tùy biến</th>
                                         </tr>
                                     </thead>
                                 <tbody>
@@ -554,7 +554,7 @@
             searching: true,
             ordering: true,
             info: true,
-            autoWidth: false,
+            autoWidth: true,
             responsive: true,
             language: {
                 "decimal":        "",

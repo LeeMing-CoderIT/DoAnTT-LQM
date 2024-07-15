@@ -19,24 +19,41 @@ class AdminController extends Controller
     }
 
     public function home(){
+        $this->data['defaulttitle'] = $this->data['title'];
+        $this->data['title'] = "Trang chủ quản trị";
         $this->data['all_request_story'] = RequestAddStory::where('status', 0)->get();
         $this->data['all_users_online'] = User::select('users.*')->join('setting_users', 'setting_users.user_id', '=', 'users.id')->where('setting_users.status', 1)->get();
         // dd($this->data);
         return view('admins.home', $this->data);
     }
+
+    public function changeWebsite(Request $request){
+        if(Auth::user()->root==1){
+            $data = $request->only('name_website','title','logo','defaultStoryImg','defaultUserImg','cap_header','cap_footer');
+            Storage::put('public/files/infoWebsite.json', json_encode($data, JSON_UNESCAPED_UNICODE));
+            return redirect()->route('admin.home')->with('type', 'success')
+            ->with('msg', 'Cập nhật thành công.');
+        }
+        return redirect()->route('admin.home')->with('type', 'error')
+            ->with('msg', 'Tài khoản không đủ quyền hạn.');
+    }
+
     public function info(){
+        $this->data['title'] = "Trang cá nhân";
         $this->data['folder'] = "info";
         $this->data['user'] = Auth::user();
         return view('admins.users.show', $this->data);
     }
 
     public function system(){
+        $this->data['title'] = "Đa giao diện";
         $this->data['folder'] = "system";
         return view('admins.system', $this->data);
     }
 
     public function login(){
         if(Auth::check()) Auth::logout();
+        $this->data['title'] = "Đăng nhập quản trị";
         return view('loginForms.loginAdmin', $this->data);
     }
 

@@ -12,39 +12,49 @@ var story_slug = $('#name-story').attr('data-slug');
 var chapter_id = $('#name-chapter').attr('data-id');
 var __token = Math.random(10);
 const app = {
-    loadingxSpeech: 20,
+    loadingxSpeech: 1,
     currentIndex: 0,
     currentSpeech: $('#speech-audio').val(),
-    isPlaying: false,
+    isPlaying: false, loading: true, continue: true,
     isFirst: true,
-    mp3: [],
-    loadMP3_x10: function(){
-        const _this = this;
-        if(textContents.children.length > 0){
-            for (let index = 0; index < _this.loadingxSpeech; index++) {
-                _this.loadMP3(index);
-            }
-        }
-    },
+    mp3: [], notMP3Loanging: [],
     loadMP3: function(index){
         const _this = this;
-        if(index < textContents.children.length){
-            $.ajax({
-                type: "get",
-                url: "/tranlateToMP3",
-                data: {
-                    text: textContents.children[index].innerText,
-                    token: __token,
-                    index: index,
-                },
-                success: function (response) {
-                    if(response.token == __token){
-                        _this.mp3[index] = response.data;
-                        index = Number(index) + _this.loadingxSpeech;
-                        _this.loadMP3(index);
-                    }
+        if(_this.continue){
+            if(index < textContents.children.length){
+                if( _this.notMP3Loanging.indexOf(index) >= 0){
+                    $.ajax({
+                        type: "get",
+                        url: "/tranlateToMP3",
+                        data: {
+                            text: textContents.children[index].innerText,
+                            token: __token,
+                            index: index,
+                        },
+                        success: function (response) {
+                            if(response.token == __token){
+                                if(_this.loading === false){
+                                    _this.continue = false
+                                    console.log('dừng');
+                                }else{
+                                    _this.notMP3Loanging.splice(_this.notMP3Loanging.indexOf(index), 1);
+                                    _this.mp3[index] = response.data;
+                                    index = Number(index) + _this.loadingxSpeech;
+                                    _this.loadMP3(index);
+                                }
+                            }
+                        }
+                    });
+                }else{
+                    index = Number(index) + _this.loadingxSpeech;
+                    _this.loadMP3(index);
                 }
-            });
+            }else{
+                if(_this.notMP3Loanging.length > 0){
+                    index = _this.notMP3Loanging[0];
+                    _this.loadMP3(index);
+                }
+            }
         }
     },
     contents: function() {
@@ -84,7 +94,9 @@ const app = {
                         setTimeout(function(){
                             $('#contents div').addClass('item-content');
                             const allContent = textContents.querySelectorAll('.item-content');
+                            _this.notMP3Loanging = [];
                             allContent.forEach((contentItem, index)=>{
+                                _this.notMP3Loanging.push(index);
                                 contentItem.addEventListener('contextmenu', (e)=>{
                                     e.preventDefault();
                                     let topContext = e.pageY;
@@ -98,7 +110,7 @@ const app = {
                             });
                             progress.max = textContents.children.length;
                             maxProgress.innerText = textContents.children.length;
-                            _this.loadMP3_x10();
+                            _this.loadMP3(_this.currentIndex);
                         },100);
                     }else{
                         $('#loading-content').addClass('d-none');
@@ -158,7 +170,17 @@ const app = {
         //click phát context menu
         $('#context-play').click(function (e) { 
             e.preventDefault();
+            audio.pause();
             _this.currentIndex = Number($('#options-contextmenu').attr('data-current'));
+            _this.loading = false;
+            var loadContinue = setInterval(()=>{
+                if(_this.continue === false) {
+                    clearInterval(loadContinue);
+                    _this.loading = true;
+                    _this.continue = true;
+                    _this.loadMP3(_this.currentIndex);
+                }
+            }, 10);
             currentProgress.innerText = this.currentIndex+1;
             _this.loadCurrentMP3();
         });
@@ -240,6 +262,15 @@ const app = {
             let value = Number(e.target.value) - 1;
             if(value < 0) value = 0;
             _this.currentIndex = value;
+            _this.loading = false;
+            var loadContinue = setInterval(()=>{
+                if(_this.continue === false) {
+                    clearInterval(loadContinue);
+                    _this.loading = true;
+                    _this.continue = true;
+                    _this.loadMP3(_this.currentIndex);
+                }
+            }, 10);
             currentProgress.innerText = this.currentIndex+1;
             _this.loadCurrentMP3();
         };

@@ -9,10 +9,20 @@ use Nette\Utils\Html;
 use PharIo\Manifest\Url;
 use App\Http\Controllers\GuzzleController;
 use Stichoza\GoogleTranslate\GoogleTranslate;
+use App\Models\Story;
 
 class HelpperController extends Controller
 {
     public $language = "vi";
+
+    public function buildSlug(Request $request){
+        $slug = \Str::slug($request->text);
+        $story = Story::where('slug', $slug)->first();
+        if($story){
+            $slug .= '-'.strtotime(date('Y-m-d H:i:s'));
+        }
+        return response($slug);
+    }
 
     public function tranlate(Request $request){
         $google = new GoogleTranslate($this->language);

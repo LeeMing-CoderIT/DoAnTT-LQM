@@ -109,10 +109,10 @@
                                 <table id="example" class="table table-bordered table-striped">
                                     <thead>
                                         <tr>
-                                            <th>#</th>
-                                            <th>Tên thể loại</th>
-                                            <th>Số lượng truyện</th>
-                                            <th>Tùy biến</th>
+                                            <th style="width: 5%;">#</th>
+                                            <th style="width: 50%;">Tên thể loại</th>
+                                            <th style="width: 10%;">Số lượng truyện</th>
+                                            <th style="width: 10%;">Tùy biến</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -383,6 +383,7 @@
                 { data: 'stories', name: 'stories' },
                 { data: 'action', name: 'action', orderable: false},
             ],
+            // columnDefs: [{ width: '10%'},null,{ width: '20%'},{ width: '30%'}],
             paging: true,
             lengthChange: true,
             lengthMenu: [[1, 5, 10, 25, 50, -1], [1,5,10, 25, 50, "Tất cả"]],
@@ -390,7 +391,7 @@
             searching: true,
             ordering: true,
             info: true,
-            autoWidth: false,
+            autoWidth: true,
             responsive: true,
             language: {
                 "decimal":        "",
@@ -417,7 +418,6 @@
                 }
             },
             scrollX: true,
-            // scrollY: 300,
             dom: '<"clear"><"top"Bifrt><"bottom"lp>',
             buttons: [
                 { text: 'Load lại', 
@@ -435,6 +435,7 @@
         $('#example_processing').html('<img src="storage/images/loading.gif" width="80" height="80">');
         $('#example_processing').css({padding: 0, margin: 0, width: '80px', height: '80px', 
             translate: '-50% -50%', 'border-radius': '50%', 'z-index': 100});
+        $('#example thead th').css({width: '50px'});
         setTimeout(function() {
             $('.dark-mode .dropdown-item').css({color: 'black'});
         }, 10);

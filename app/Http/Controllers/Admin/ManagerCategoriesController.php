@@ -20,13 +20,14 @@ class ManagerCategoriesController extends Controller
 
     public function index(Request $request)
     {
+        $this->data['title'] = "Quản lý danh sách thể loại";
         $this->data['path_active'] = $request->path();
         return view('admins.categories.index', $this->data);
     }
 
     public function all(Request $request)
     {
-        $data = Category::select('*')->orderByDesc('id')->get();
+        $data = Category::select('*')->get();
         foreach ($data as $key => $value) {
             $data[$key]->index = $key+1;
             $data[$key]->stories = $value->stories()->count();

@@ -18,11 +18,21 @@
 
         // clear previous preview
         target_preview.html('');
-
+        pixel_avatar = {};
+        if(target_preview[0].dataset.width){
+          pixel_avatar.width = target_preview[0].dataset.width;
+        }
+        if(target_preview[0].dataset.height){
+          pixel_avatar.height = target_preview[0].dataset.height;
+        }
+        if(target_preview[0].dataset.circle){
+          pixel_avatar['border-radius'] = target_preview[0].dataset.circle;
+        }
+        // console.log(pixel_avatar);
         // set or change the preview image src
         items.forEach(function (item) {
           target_preview.append(
-            $('<img>').css('height', '5rem').attr('src', item.thumb_url)
+            $('<img>').css(pixel_avatar).attr('src', item.thumb_url)
           );
         });
 
