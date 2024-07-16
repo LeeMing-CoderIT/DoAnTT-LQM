@@ -76,7 +76,7 @@ class ManagerUsersController extends Controller
     public function add(Request $request)
     {
         $response = []; $response['success'] = false;
-        $data = $request->only('author', 'name', 'slug', 'image', 'categories', 'status', 'description');
+        $data = $request->only('fullname', 'avatar', 'phone', 'password');
         try {
             $story = Story::create($data);
             $response['success'] = true;
@@ -87,31 +87,97 @@ class ManagerUsersController extends Controller
         return response()->json($response);
     }
 
-    public function edit(Request $request, Story $story)
+    public function edit(Request $request)
     {
-        $response = []; $response['success'] = false;
-        $data = $request->only('author', 'name', 'slug', 'image', 'categories', 'status', 'description');
+        $user = User::find((int)$request->iduser);
+        $response = []; $response['success'] = false; $response['msg'] = 'Cập nhật thất bại.';$response['type'] = 'error';
+        $data = $request->only('fullname', 'avatar', 'phone', 'password');
+        // dd($data,$user);
         try {
-            $story->update($data);
-            $response['success'] = true;
-            $response['msg'] = $story;
-        } catch (\Throwable $th) {
-            $response['msg'] = $th; 
-        }
-        return response()->json($response);
-    }
-
-    public function delete(Story $story)
-    {
-        $response = []; $response['success'] = false; $response['msg'] = 'Xóa dữ liệu thất bại.';
-        try {
-            if($story->delete()){
+            if($data['avatar'] == '/storage/photos/3/local/vo-danh.jpg'){
+                $data['avatar'] = null;
+            }else{
+                $data['avatar'] = explode('storage/images/users/', $data['avatar'])[1];
+            }
+            if($request->has('password')){
+                $data['password'] = bcrypt($data['password']);
+            }
+            if(\Auth::user()->root==1 || \Auth::user()->id == $user->id){
+                $user->update($data);
                 $response['success'] = true;
-                $response['data'] = $story;
-                $response['msg'] = "Xóa dữ liệu thành công.";
+                $response['data'] = $data;
+                $response['type'] = 'success';
+                $response['msg'] = 'Cập nhật thành công.';
             }
         } catch (\Throwable $th) {
-            $response['msg'] = $th; 
+            
+        }
+        if($request->ajax()){
+            return response()->json($response);
+        }
+        return back()->with('type', $response['type'])
+        ->with('msg', $response['msg']);;
+    }
+
+    public function unlock(Request $request, User $user)
+    {
+        $response = []; $response['success'] = false; $response['msg'] = 'Kích hoạt thất bại.';$response['type'] = 'error';
+        // dd($user);
+        try {
+            if(\Auth::user()->root==1){
+                $user->update(['root' => 0]);
+                $response['success'] = true;
+                $response['type'] = 'success';
+                $response['msg'] = 'Kích hoạt thành công.';
+            }
+        } catch (\Throwable $th) {
+            
+        }
+        if($request->ajax()){
+            return response()->json($response);
+        }
+        return back()->with('type', $response['type'])
+        ->with('msg', $response['msg']);;
+    }
+
+    public function lock(Request $request, User $user)
+    {
+        $response = []; $response['success'] = false; $response['msg'] = 'Khóa tài khoản thất bại.';$response['type'] = 'error';
+        // dd($user);
+        try {
+            if(\Auth::user()->root==1){
+                $user->update(['root' => -1]);
+                $response['success'] = true;
+                $response['type'] = 'success';
+                $response['msg'] = 'Khóa tài khoản thành công.';
+            }
+        } catch (\Throwable $th) {
+            
+        }
+        if($request->ajax()){
+            return response()->json($response);
+        }
+        return back()->with('type', $response['type'])
+        ->with('msg', $response['msg']);
+    }
+
+    public function delete(User $user)
+    {
+        $response = []; $response['success'] = false; $response['msg'] = 'Xóa dữ liệu thất bại.';$response['type'] = 'error';
+        try {
+            if(\Auth::user()->root==1){
+                if($user->delete()){
+                    $user->settings()->delete();
+                    $response['success'] = true;
+                    $response['data'] = $user;
+                    $response['type'] = 'success';
+                    $response['msg'] = 'Xóa thành công.';
+                }
+            }else{
+                $response['msg'] = 'Không có quyền hạn.';
+            }
+        } catch (\Throwable $th) {
+            
         }
         return response()->json($response);
     }
@@ -156,5 +222,27 @@ class ManagerUsersController extends Controller
 
         }
         return response()->json($response);
+    }
+
+    public function lockManagerStory(Request $request, Story $story, User $user){
+        $response = []; $response['success'] = false; $response['msg'] = 'Xóa quyền quản trị của người dùng thất bại.';
+        $response['type'] = 'error';
+        try{
+            $manager = json_decode($story->infoViews()->manager_users, true);
+            if(($index = array_search($user->id, $manager,)) !== false){
+                unset($manager[$index]);
+            }
+            $story->infoViews()->update(['manager_users'=>$manager]);
+            $response['success'] = true;
+            $response['type'] = 'success';
+            $response['msg'] = 'Xóa quyền quản trị của người dùng thành công.';
+        }catch(\Throwable $th){
+
+        }
+        if($request->ajax()){
+            return response()->json($response);
+        }
+        return back()->with('type', $response['type'])
+        ->with('msg', $response['msg']);
     }
 }

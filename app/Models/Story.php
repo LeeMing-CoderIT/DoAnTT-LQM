@@ -57,6 +57,21 @@ class Story extends Model
         }
         return $list;
     }
+    public function rawCategories(){
+        $arr = [];
+        foreach ($this->categories as $key => $category) {
+            $arr[] = $category->id;
+        }
+        return json_encode($arr,JSON_UNESCAPED_UNICODE);
+    }
+    public function nameCategories(){
+        $str = "";
+        foreach ($this->categories as $key => $category) {
+            if($key > 0) $str .= ', ';
+            $str .= $category->name;
+        }
+        return $str;
+    }
 
     public function newChapter(){
         return $this->hasMany(Chapter::class, 'story_id', 'id')->orderByDesc('index_chap')->first();

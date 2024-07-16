@@ -1,2 +1,2 @@
-<a href="{{route('admin.stories.show', ['story'=>$id])}}" 
+<a href="{{route('admin.users.show', ['user'=>$user_id])}}" 
     title="Email: {{$user->email}}">{{$user->fullname}}</a>

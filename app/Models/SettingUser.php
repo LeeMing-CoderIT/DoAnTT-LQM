@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 class SettingUser extends Model
 {
     use HasFactory;
-    protected $fillable = ['status', 'background', 'language', 'speech', 'history'];
+    protected $fillable = ['user_id', 'status', 'background', 'language', 'speech', 'history'];
 
     protected function history(): Attribute{
         return Attribute::make(

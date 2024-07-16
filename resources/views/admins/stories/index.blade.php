@@ -129,7 +129,7 @@
                                     <!-- /btn-group -->
                                     <input id="txtimage" class="form-control" style="padding-left: 45px;" type="text" name="image" readonly>
                                 </div>
-                                <div id="holder" class="row d-flex justify-content-center" style="max-height:120px;"></div>
+                                <div id="holder" class="row d-flex justify-content-center" data-height="6rem"></div>
                             </div>
                             <div class="form-group">
                                 <label>Trạng thái:</label>
@@ -309,9 +309,15 @@
                         author: function() {
                             return $( "#txtauthor" ).val();
                         },
+                        submit: function() {
+                            return $('#formDataStory').attr('data-submit');
+                        },
+                        id: function() {
+                            return $('#txtID').val();
+                        },
                     },
                     dataFilter: function (response) {
-                        return ($('#formDataStory').attr('data-submit')=='edit')?true:response;
+                        return response;
                     }
                 }
             },
@@ -563,6 +569,12 @@
     
     //link file manager
     $('#lfm').filemanager('image');
+    $('#txtimage').change(function (e) { 
+        e.preventDefault();
+        let value = $(this).val();
+        let host = '{{env('APP_URL')}}';
+        $(this).val(value.slice(host.length-1));
+    });
     //tạo dataTable
     $(function () {
         var table = new DataTable('#example', {
@@ -641,6 +653,7 @@
             url: "{{route('buildSlug')}}",
             data: {
                 text: $(element).val(),
+                id: $('#txtID').val(),
             },
             success: function (response) {
                 $(asElement).val(response);

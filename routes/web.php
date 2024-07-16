@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use App\Http\Controllers\CrawlDataController;
+use App\Http\Controllers\CustomUploadController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,13 +27,19 @@ use App\Http\Controllers\CrawlDataController;
 |
 */
 Route::get('test', function () {
-    $image = explode('storage','/storage/photos/1/images/tu-la-ma-de.jpg');
-    $image = '/storage'.$image[1];
-    dd($image);
+    $data['image'] = 'https://lh3.googleusercontent.com/pw/AIL4fc-BV58s_mFbXosakwhGx7lqwtD4g9zQ7_TLjLkSvx5zejJ2hzpbr6oWKD8LPs0NLJCwZpdLy_Rr5e7aDX6Q0PCAruHj8V6oh7J8K7v5AxQKbdkvANhGuafTrUUsS8hNSeHjX3rHXUF4drVko4g2rWBq=w215-h322-s-no?authuser=0';
+    $base64Img = \Http::get($data['image'])->body();
+    $ext = pathinfo($data['image'], PATHINFO_EXTENSION) ?? 'jpg';
+    $ext = $ext!=''?$ext:'jpg';
+    $new_file = 'test-truyen'.'.'.$ext;
+    $full_path = 'public/photos/1/images/'.$new_file;
+    Storage::put($full_path, $base64Img);
+    dd($base64Img, $ext, $new_file, Storage::url($full_path));
 });
 //****************user*************
     Route::get('/crawler', [CrawlDataController::class, "crawler"])->name("crawler");
     Route::get('/build-slug', [HelpperController::class, "buildSlug"])->name("buildSlug");
+    Route::get('/lock-manager-story/{story}/{user}', [ManagerUsersController::class, "lockManagerStory"])->name("lockManagerStory");
 
     Route::get('/', [AppController::class, "home"])->name("home");
     Route::get('/filter-stories', [AppController::class, "filter"])->name("filter");
@@ -81,14 +88,36 @@ Route::middleware('realtimeLogin')->group(function(){
         Route::post('/login', [AdminController::class, "postLogin"])->name("postLogin");
         Route::get('/logout', [AdminController::class, "logout"])->name("logout");
 
+        Route::prefix('/stories')->name('stories.')->group(function (){
+            Route::get('/', [ManagerStoriesController::class, "index"])->name("index");
+            Route::get('/all', [ManagerStoriesController::class, "all"])->name("all");
+            Route::post('/add', [ManagerStoriesController::class, "add"])->name("add");
+            Route::get('/show/{story}', [ManagerStoriesController::class, "show"])->name("show");
+            Route::patch('/edit/{story}', [ManagerStoriesController::class, "edit"])->name("edit");
+            Route::delete('/delete/{story}', [ManagerStoriesController::class, "delete"])->name("delete");
+
+            Route::prefix('/{story}/chapters')->name('chapters.')->group(function (){
+                Route::get('/all', [ManagerChaptersController::class, "all"])->name("all");
+                Route::post('/add', [ManagerChaptersController::class, "add"])->name("add");
+                Route::get('/show/{chapter?}', [ManagerChaptersController::class, "show"])->name("show");
+                Route::patch('/edit/{chapter}', [ManagerChaptersController::class, "edit"])->name("edit");
+                Route::delete('/delete/{chapter}', [ManagerChaptersController::class, "delete"])->name("delete");
+            });
+        });
+
         Route::middleware('adminActive')->group(function (){
             Route::group(['prefix' => 'laravel-filemanager'], function () {
                 \UniSharp\LaravelFilemanager\Lfm::routes();
+                Route::post('/upload', [CustomUploadController::class, 'upload'])->name('unisharp.lfm.upload');
             });
             Route::get('/', [AdminController::class, "home"])->name("home");
             Route::post('/change-website', [AdminController::class, "changeWebsite"])->name("changeWebsite");
+            Route::get('/load-user', [AdminController::class, "loadUser"])->name("loadUser");
+            Route::get('/load-user-selected', [AdminController::class, "loadUserSelected"])->name("loadUserSelected");
+            Route::post('/add-manager-story/{story}', [AdminController::class, "addManager"])->name("addManager");
             
             Route::get('/info', [AdminController::class, "info"])->name("info");
+            Route::post('/change-user', [ManagerUsersController::class, "edit"])->name("changeUser");
             Route::prefix('/system')->name('system.')->group(function (){
                 Route::get('/', [AdminController::class, "system"])->name("index");
             });
@@ -103,22 +132,6 @@ Route::middleware('realtimeLogin')->group(function(){
                 Route::patch('/edit/{category}', [ManagerCategoriesController::class, "edit"])->name("edit");
                 Route::delete('/delete/{category}', [ManagerCategoriesController::class, "delete"])->name("delete");
             });
-            Route::prefix('/stories')->name('stories.')->group(function (){
-                Route::get('/', [ManagerStoriesController::class, "index"])->name("index");
-                Route::get('/all', [ManagerStoriesController::class, "all"])->name("all");
-                Route::post('/add', [ManagerStoriesController::class, "add"])->name("add");
-                Route::get('/show/{story}', [ManagerStoriesController::class, "show"])->name("show");
-                Route::patch('/edit/{story}', [ManagerStoriesController::class, "edit"])->name("edit");
-                Route::delete('/delete/{story}', [ManagerStoriesController::class, "delete"])->name("delete");
-
-                Route::prefix('/{story}/chapters')->name('chapters.')->group(function (){
-                    Route::get('/all', [ManagerChaptersController::class, "all"])->name("all");
-                    Route::post('/add', [ManagerChaptersController::class, "add"])->name("add");
-                    Route::get('/show/{chapter?}', [ManagerChaptersController::class, "show"])->name("show");
-                    Route::patch('/edit/{chapter}', [ManagerChaptersController::class, "edit"])->name("edit");
-                    Route::delete('/delete/{chapter}', [ManagerChaptersController::class, "delete"])->name("delete");
-                });
-            });
             Route::prefix('/requests')->name('requests.')->group(function (){
                 Route::get('/addStory', [ManagerRequestController::class, "index"])->name("index");
                 Route::get('/allAddStory', [ManagerRequestController::class, "allAddStory"])->name("allAddStory");
@@ -131,7 +144,9 @@ Route::middleware('realtimeLogin')->group(function(){
                 Route::get('/all', [ManagerUsersController::class, "all"])->name("all");
                 Route::post('/add', [ManagerUsersController::class, "add"])->name("add");
                 Route::get('/show/{user}', [ManagerUsersController::class, "show"])->name("show");
-                Route::patch('/edit/{user}', [ManagerUsersController::class, "edit"])->name("edit");
+                // Route::patch('/edit/{user}', [ManagerUsersController::class, "edit"])->name("edit");
+                Route::get('/lock/{user}', [ManagerUsersController::class, "lock"])->name("lock");
+                Route::get('/unlock/{user}', [ManagerUsersController::class, "unlock"])->name("unlock");
                 Route::delete('/delete/{user}', [ManagerUsersController::class, "delete"])->name("delete");
                 
                 Route::get('/manager-decentralization', [ManagerUsersController::class, "decentralization"])->name("decentralization");

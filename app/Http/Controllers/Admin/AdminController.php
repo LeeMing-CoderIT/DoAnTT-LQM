@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\RequestAddStory;
 use App\Models\User;
+use App\Models\Story;
 use Illuminate\Http\Request;
 use Auth;
 use Storage;
@@ -76,5 +77,66 @@ class AdminController extends Controller
     public function logout(){
         if(Auth::check()) Auth::logout();
         return redirect()->route('admin.login');
+    }
+
+    public function loadUser(Request $request){
+        $users = User::limit(20);
+        if($request->has('search')){
+            $users->where(function ($user) use ($request){
+                $user->where('email', 'like', '%'.$request->search.'%')
+                    ->orWhere('fullname', 'like', '%'.$request->search.'%');
+            });
+        }
+        if($request->has('list') && is_array($request->list)){
+            foreach ($request->list as $key => $value) {
+                $users->where('id', '<>', (int)$value);
+            }
+        }
+        $data = $users->where('root', 0)->get();
+        // dd($data);
+        return response()->json($data);
+    }
+    public function loadUserSelected(Request $request){
+        $users = User::select('*');
+        if($request->has('list') && is_array($request->list)){
+            foreach ($request->list as $key => $value) {
+                $users->orWhere('id', (int)$value);
+            }
+            $data = $users->where('root', 0)->get();
+        }else{
+            $data = [];
+        }
+        // dd($data);
+        return response()->json($data);
+    }
+
+    public function addManager(Request $request, Story $story){
+        $response = []; $response['success'] = false; $response['msg'] = 'Thêm quyền quản trị của người dùng thất bại.';
+        $response['type'] = 'error';
+        try{
+            $manager = json_decode($story->infoViews()->manager_users, true);
+            if($request->has('txtlist-selected')){
+                $arr = json_decode($request->get('txtlist-selected'));
+                if(is_array($arr)){
+                    foreach ($arr as $key => $value) {
+                        if(User::find((int)$value) && !in_array((int)$value, $manager)){
+                            $manager[] = (int)$value;
+                        }
+                    }
+                }
+                // dd($arr);
+            }
+            $story->infoViews()->update(['manager_users'=>$manager]);
+            $response['success'] = true;
+            $response['type'] = 'success';
+            $response['msg'] = 'Thêm quyền quản trị của người dùng thành công.';
+        }catch(\Throwable $th){
+
+        }
+        if($request->ajax()){
+            return response()->json($response);
+        }
+        return back()->with('type', $response['type'])
+        ->with('msg', $response['msg']);
     }
 }

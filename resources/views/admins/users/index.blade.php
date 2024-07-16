@@ -34,6 +34,7 @@
                             <select id="root" class="form-control">
                                 <option value="*">Tất cả</option>
                                 <option value="1">Admin</option>
+                                <option value="2">Biên tập viên</option>
                                 <option value="0" selected>Người dùng</option>
                                 <option value="-1">Tài khoản chưa kích hoạt</option>
                             </select>

@@ -16,10 +16,19 @@ class HelpperController extends Controller
     public $language = "vi";
 
     public function buildSlug(Request $request){
+        // dd($request->all());
         $slug = \Str::slug($request->text);
         $story = Story::where('slug', $slug)->first();
         if($story){
-            $slug .= '-'.strtotime(date('Y-m-d H:i:s'));
+            if($request->id && $request->id != ''){
+                $id = (int)$request->id;
+                if($story->id != $id){
+                    $slug .= '-'.strtotime(date('Y-m-d H:i:s'));
+                }
+            }
+            else{
+                $slug .= '-'.strtotime(date('Y-m-d H:i:s'));
+            }
         }
         return response($slug);
     }

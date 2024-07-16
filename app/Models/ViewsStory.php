@@ -73,7 +73,7 @@ class ViewsStory extends Model
                     unset($history[$insexHas]);
                 }
                 array_unshift($history, $this->buildHistory($chapter, $paragraph));
-                Auth::user()->settings()->update(['history'=> json_encode($history, JSON_UNESCAPED_UNICODE)]);
+                Auth::user()->settings()->update(['history'=> $history]);
             }
         }
         // return $this;

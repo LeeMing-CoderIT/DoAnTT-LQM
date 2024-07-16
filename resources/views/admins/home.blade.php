@@ -209,8 +209,26 @@
     @endif
     //link file manager
     $('#lfm').filemanager('image');
+    $('#txtimage').change(function (e) { 
+        e.preventDefault();
+        let value = $(this).val();
+        let host = '{{env('APP_URL')}}';
+        $(this).val(value.slice(host.length-1));
+    });
     $('#lfm-story').filemanager('image');
+    $('#txtimagestory').change(function (e) { 
+        e.preventDefault();
+        let value = $(this).val();
+        let host = '{{env('APP_URL')}}';
+        $(this).val(value.slice(host.length-1));
+    });
     $('#lfm-user').filemanager('image');
+    $('#txtimageuser').change(function (e) { 
+        e.preventDefault();
+        let value = $(this).val();
+        let host = '{{env('APP_URL')}}';
+        $(this).val(value.slice(host.length-1));
+    });
     $('#btn-edit-website').click(function (e) { 
         e.preventDefault();
         $('.edit').removeClass('d-none');

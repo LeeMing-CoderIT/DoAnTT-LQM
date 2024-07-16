@@ -16,7 +16,9 @@ return [
      */
 
     'use_package_routes'       => true,
-
+    'base_directory' => 'public/uploads',
+    'images_folder_name' => 'photos',
+    'files_folder_name'  => 'files',
     /*
     |--------------------------------------------------------------------------
     | Shared folder / Private folder

@@ -65,7 +65,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function showHistory(){
         $data = [];
-        $history = json_decode($this->settings()->history, true);
+        $history = $this->settings()->history;
         foreach($history as $key => $item){
             $arr = [];
             $arr['story'] = Story::find($item[0]);

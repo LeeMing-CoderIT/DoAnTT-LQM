@@ -18,7 +18,9 @@
 
         // clear previous preview
         target_preview.html('');
-        pixel_avatar = {};
+        pixel_avatar = {
+          'margin-top': '5px'
+        };
         if(target_preview[0].dataset.width){
           pixel_avatar.width = target_preview[0].dataset.width;
         }
