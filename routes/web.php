@@ -49,9 +49,9 @@ Route::get('test', function () {
     Route::get('/loadChap/{story?}', [AppController::class, "loadChap"])->name("loadChap");
     Route::get('/loadCategories', [AppController::class, "loadCategories"])->name("loadCategories");
     Route::get('/show-chapter', [AppController::class, "showChapter"])->name("showChapter");
-    Route::get('/listen/{story}/{chap}', [AppController::class, "listen"])->name("listen");
+    Route::get('/listen/{story}/{chap}', [AppController::class, "listen"])->middleware('auth')->name("listen");
     Route::get('/tranlateToMP3', [HelpperController::class, "tranlateToMP3_2"])->name("tranlateToMP3");
-    Route::get('/infoUser', [AppController::class, "infoUser"])->name('infoUser');
+    Route::get('/infoUser', [AppController::class, "infoUser"])->middleware('auth')->name('infoUser');
     Route::post('/infoUser', [AppController::class, "postInfoUser"])->name('postInfoUser');
     Route::post('/infoUser-settings', [AppController::class, "postInfoUserSetting"])->name('postInfoUserSetting');
     Route::get('/change-speech', [AppController::class, "changeSpeech"])->name('changeSpeech');
@@ -88,7 +88,7 @@ Route::middleware('realtimeLogin')->group(function(){
         Route::post('/login', [AdminController::class, "postLogin"])->name("postLogin");
         Route::get('/logout', [AdminController::class, "logout"])->name("logout");
 
-        Route::prefix('/stories')->name('stories.')->group(function (){
+        Route::prefix('/stories')->middleware('auth')->name('stories.')->group(function (){
             Route::get('/', [ManagerStoriesController::class, "index"])->name("index");
             Route::get('/all', [ManagerStoriesController::class, "all"])->name("all");
             Route::post('/add', [ManagerStoriesController::class, "add"])->name("add");

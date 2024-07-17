@@ -17,7 +17,7 @@ class CrawlDataController extends Controller
             // dd($request->addNow);
             if($request->source == 'truyenfull'){
                 $data = CrawlerTruyenFullController::crawler($request->type, $request->link, 
-                    ($request->bug??false), ($request->page??null), ($request->first??null), 
+                    ($request->bug??false), ($request->page??null),
                     ($request->story_id??1), ($request->chapterIndex??null), ($request->addNow??true));
             }
         }

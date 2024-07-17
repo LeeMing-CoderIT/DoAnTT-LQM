@@ -16,9 +16,11 @@
 			<div class="row justify-content-center">
                 <div class="col-md-6 col-lg-4">
                     <div class="login-wrap py-5">
-                        <div class="img d-flex align-items-center justify-content-center" 
-                            style="background-image: url(storage/images/logo.png);">
-                        </div>
+                        <a href="{{route('home')}}">
+                            <div class="img d-flex align-items-center justify-content-center" 
+                                style="background-image: url({{ $logo }});">
+                            </div>
+                        </a>
                         @yield('content')
                     </div>
 				</div>

@@ -14,7 +14,7 @@ class UserController extends Controller
 {
     public $data = [];
     public function __construct(){
-        $this->data['logo'] = "logo.png";
+        $this->data = json_decode(\Storage::get('public/files/infoWebsite.json'), true);
     }
     public function login(){
         if(Auth::check()) Auth::logout();

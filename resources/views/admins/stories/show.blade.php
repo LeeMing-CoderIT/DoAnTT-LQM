@@ -594,7 +594,7 @@
             $(this).text('Dừng');
             loadChaptersCrawler({
                 source: sourceStudio, type: 'link-chapters', 
-                link: linkSource, page: nowPage, first: (pagesCrawler==1)?true:false
+                link: linkSource, page: nowPage
             });
         }else{
             $(this).text('Bắt đầu cập nhật');
@@ -607,7 +607,7 @@
                 url: `/crawler`,
                 data: data,
                 success: function (response) {
-                    console.log(response);
+                    console.log(response, nowPage);
                     if(response.error && response.bug){
                         let newwin = window.open(response.error, '_blank');
                         // data.bug = true;
@@ -629,13 +629,13 @@
                                         nowPage = Number(nowPage)+1;
                                         loadChaptersCrawler({
                                             source: sourceStudio, type: 'link-chapters', 
-                                            link: linkSource, page: nowPage, first: (pagesCrawler==1)?true:false
+                                            link: linkSource, page: nowPage,
                                         });
                                     }
                                 }
                             });
                         }
-                        if(lastSourceChapter == '' && nextPage === false){
+                        else if(lastSourceChapter == '' && nextPage === false){
                             loadChapter({
                                 source: sourceStudio, type: 'chapter', chapterIndex: lastChapter,
                                 link: listLinks[indexLoading], page: nowPage
@@ -649,6 +649,7 @@
                 continueStarting = false;
                 $('#update-chapters-starting').text('Bắt đầu cập nhật');
                 Swal.fire(`Đã cập nhật hoàn tất toàn bộ chương từ nguồn.`, "", 'success');
+                $('#update-chapters-starting').addClass('d-none');
                 newChapterUpdate = 0;
             }
         }
@@ -680,7 +681,7 @@
                             nowPage = Number(nowPage)+1;
                             loadChaptersCrawler({
                                 source: sourceStudio, type: 'link-chapters', 
-                                link: linkSource, page: nowPage, first: (pagesCrawler==1)?true:false
+                                link: linkSource, page: nowPage,
                             });
                         }else{
                             loadChapter({
@@ -718,7 +719,7 @@
                 url: `/crawler`,
                 data: data,
                 success: function (response) {
-                    // console.log(response);
+                    console.log(response);
                     if(response.error && response.bug){
                         let newwin = window.open(response.error, '_blank');
                         // data.bug = true;
@@ -736,6 +737,7 @@
                             Swal.fire(`Có tổng ${updateChapters} chương mới chưa được cập nhật`, "", 'success');
                         }else{
                             $('#update-chapters-starting').addClass('d-none');
+                            $('#update-chapters-source').text('Cập nhật từ nguồn');
                             Swal.fire(`Không có chương mới`, "", 'info');
                         }
                     }

@@ -24,11 +24,11 @@ class CrawlerTruyenFullController extends Controller
         $this->link = $link;
         $this->bug = $bug;
     }
-    public static function crawler($type = 'story', $link, $bug = false, $page = null, $first = false, $story_id, $chapterIndex = null, $addNow){
+    public static function crawler($type = 'story', $link, $bug = false, $page = null, $story_id, $chapterIndex = null, $addNow){
         $crawler = new CrawlerTruyenFullController($type, $link, $bug);
         if($type == 'story') return $crawler->crawlerStory();
         elseif($type == 'count-chapters') return $crawler->allChaptersFull($story_id);
-        elseif($type == 'link-chapters') return $crawler->linkChapters($page, $first);
+        elseif($type == 'link-chapters') return $crawler->linkChapters($page);
         elseif($type == 'chapter') return $crawler->crawlerChapter($page, $story_id, $chapterIndex, $addNow);
         else return null;
     }
@@ -69,15 +69,15 @@ class CrawlerTruyenFullController extends Controller
         return $story;
     }
 
-    protected function linkChapters($page = 1, $first = false){
+    protected function linkChapters($page = 1){
         try {
             $links = [];
-            if ($first) {
+            if ($page == 1) {
                 $this->link = trim($this->link, ' /').'/';
             } else {
                 $this->link = trim($this->link, ' /').'/trang-'.$page.'/';
             }
-            
+            // dd($this->link, $page);
             $html = file_get_html($this->link, false, stream_context_create($this->arrConttextOption));
             $chapters = $html->find('#list-chapter > div.row > div > ul > li > a');
             foreach ($chapters as $key => $chapter) {

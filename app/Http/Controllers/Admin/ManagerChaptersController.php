@@ -80,13 +80,14 @@ class ManagerChaptersController extends Controller
         return response()->json($response);
     }
 
-    public function delete(Story $story, $index_chap)
+    public function delete(Story $story, Chapter $chapter)
     {
         $response = []; $response['success'] = false; $response['msg'] = 'Xóa chương thất bại.';
         try {
-            if($story->findChapter($index_chap)->delete()){
+            if($story->id == $chapter->story_id){
+                $chapter->delete();
                 $response['success'] = true;
-                $response['data'] = $story->findChapter($index_chap);
+                $response['data'] = $chapter;
                 $response['msg'] = "Xóa chương thành công.";
             }
         } catch (\Throwable $th) {
