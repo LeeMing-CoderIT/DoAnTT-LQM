@@ -23,4 +23,8 @@ class CrawlDataController extends Controller
         }
         return response()->json($data);
     }
+
+    public function crawlerCategories(){
+        return CrawlerTruyenFullController::crawlerCategories();
+    }
 }

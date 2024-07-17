@@ -12,7 +12,7 @@ use App\Models\ViewsStory;
 class CrawlerTruyenFullController extends Controller
 {
     public $link, $type, $bug, $source = 'truyenfull';
-    public static $arrConttextOption = [
+    protected static $arrConttextOption = [
         'ssl' => [
             'verify_peer' => false,
             'verify_peer_name' => false,
@@ -35,7 +35,7 @@ class CrawlerTruyenFullController extends Controller
 
     protected function crawlerStory(){
         try {
-            $html = file_get_html($this->link, false, stream_context_create($this->arrConttextOption)); //, false, stream_context_create($this->arrConttextOption)
+            $html = file_get_html($this->link, false, stream_context_create(self::$arrConttextOption)); //, false, stream_context_create(self::$arrConttextOption)
             // dd($this);
             $story = [];
             foreach ($html->find('#truyen > div.col-truyen-main > div.col-info-desc > div.info-holder > div.info > div > a') as $key => $value) {
@@ -78,7 +78,7 @@ class CrawlerTruyenFullController extends Controller
                 $this->link = trim($this->link, ' /').'/trang-'.$page.'/';
             }
             // dd($this->link, $page);
-            $html = file_get_html($this->link, false, stream_context_create($this->arrConttextOption));
+            $html = file_get_html($this->link, false, stream_context_create(self::$arrConttextOption));
             $chapters = $html->find('#list-chapter > div.row > div > ul > li > a');
             foreach ($chapters as $key => $chapter) {
                 $links[] = $chapter->href;
@@ -94,7 +94,7 @@ class CrawlerTruyenFullController extends Controller
     protected function allChaptersFull($story_id){
         try {
             $last_page = 1; $chapters = 0;
-            $html = file_get_html($this->link, false, stream_context_create($this->arrConttextOption));
+            $html = file_get_html($this->link, false, stream_context_create(self::$arrConttextOption));
             $pages = $html->find('#list-chapter > ul > li > a');
             foreach ($pages as $key => $page) {
                 if(count($page->children) > 1){
@@ -115,7 +115,7 @@ class CrawlerTruyenFullController extends Controller
                 $last_page = 1;
                 $this->link = trim($this->link, ' /').'/';
             }
-            $html = file_get_html($this->link, false, stream_context_create($this->arrConttextOption));
+            $html = file_get_html($this->link, false, stream_context_create(self::$arrConttextOption));
             $last_chapters = $html->find('#list-chapter > div.row > div > ul > li');
             $chapters += count($last_chapters);
             return ['pages' => $last_page, 'chapters' => $chapters];
@@ -126,7 +126,7 @@ class CrawlerTruyenFullController extends Controller
     }
     protected function crawlerChapter($page, $story_id, $chapterIndex, $addNow){
         try {
-            $html = file_get_html($this->link, false, stream_context_create($this->arrConttextOption));
+            $html = file_get_html($this->link, false, stream_context_create(self::$arrConttextOption));
             $chapter = [];
             $chapter['source']['source'] = $this->source;
             $chapter['source']['link'] = $this->link;
@@ -176,14 +176,36 @@ class CrawlerTruyenFullController extends Controller
         }
     }
 
-    public static function categories(){
+    public static function crawlerCategories(){
         $categories = [];
         try {
-            $html = file_get_html('', false, stream_context_create(self::$arrConttextOption)); //, false, stream_context_create($this->arrConttextOption)
-            dd($html);
+            $html = file_get_html('https://truyenfull.vn/', false, stream_context_create(self::$arrConttextOption)); //, false, stream_context_create(self::$arrConttextOption)
+            $arrCate = $html->find('#nav > div.container > div> ul > li.dropdown> div > div > div > ul > li > a');
+            foreach($arrCate as $cate){
+                $categories[] = [$cate->href, $cate->title];
+            }
+            // dd($categories);
         } catch (\Throwable $th) {
             
         }
         return $categories;
+    }
+
+    public static function crawlerCategory($link, $title, $bug = 0){
+        $category = null;
+        $category['name'] = trim(substr($title, 8));
+        $category['slug'] = \Str::slug($category['name']);
+        $category['link'] = $link;
+        try {
+            $html = file_get_html($link, false, stream_context_create(self::$arrConttextOption));
+            $category['description'] = (string)$html->find('#list-page > div.col-truyen-side > div > div.cat-desc.text-left > div')[0];
+        } catch (\Throwable $th) {
+            if($bug == 5){
+                $category['description'] = '';
+            }else{
+                return self::crawlerCategory($link, $title, ($bug+1));
+            }
+        }
+        return $category;
     }
 }
