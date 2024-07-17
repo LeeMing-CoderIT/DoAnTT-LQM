@@ -12,7 +12,7 @@ use App\Models\ViewsStory;
 class CrawlerTruyenFullController extends Controller
 {
     public $link, $type, $bug, $source = 'truyenfull';
-    protected $arrConttextOption = [
+    public static $arrConttextOption = [
         'ssl' => [
             'verify_peer' => false,
             'verify_peer_name' => false,
@@ -174,5 +174,16 @@ class CrawlerTruyenFullController extends Controller
             if(!$this->bug) return ['error' => $this->link, 'bug' => true];
             else return false;
         }
+    }
+
+    public static function categories(){
+        $categories = [];
+        try {
+            $html = file_get_html('', false, stream_context_create(self::$arrConttextOption)); //, false, stream_context_create($this->arrConttextOption)
+            dd($html);
+        } catch (\Throwable $th) {
+            
+        }
+        return $categories;
     }
 }

@@ -1,0 +1,39 @@
+[
+    {
+        "name": "Trang chủ", "icon": "fa-home", "folder": "home", "link": "admin"
+    },
+    {
+        "name": "Quản lý kho thể loại", "icon": "fa-list", "folder": "categories", "link": "admin/categories"
+    },
+    {
+        "name": "Quản lý kho truyện", "icon": "fa-book", "folder": "stories", "link": "admin/stories"
+    },
+    {
+        "name": "Quản lý người dùng", "icon": "fa-user", "folder": "users", "root": 1,
+        "items": [
+            {
+                "name": "Danh sách người dùng", "icon": "fa-users", "link": "admin/users"
+            },
+            {
+                "name": "Quản lý quyền người dùng", "icon": "fa-user-tie", "link": "admin/users/manager-decentralization"
+            }
+        ]
+    },
+    {
+        "name": "Quản lý yêu cầu", "icon": "fa-tasks", "folder": "requests",
+        "items": [
+            {
+                "name": "Thêm truyện", "icon": "fa-book", "link": "admin/requests/addStory"
+            }
+        ]
+    },
+    {
+        "name": "Đa giao diện", "icon": "fa-desktop", "folder": "system", "link": "admin/system"
+    },
+    {
+        "name": "App người dùng", "icon": "fa-desktop", "folder": "app", "link": "/"
+    },
+    {
+        "name": "Đăng xuất", "icon": "fa-sign-out-alt", "link": "admin/logout"
+    }
+]
