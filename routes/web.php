@@ -27,14 +27,7 @@ use App\Http\Controllers\CustomUploadController;
 |
 */
 Route::get('test', function () {
-    $data['image'] = 'https://lh3.googleusercontent.com/pw/AIL4fc-BV58s_mFbXosakwhGx7lqwtD4g9zQ7_TLjLkSvx5zejJ2hzpbr6oWKD8LPs0NLJCwZpdLy_Rr5e7aDX6Q0PCAruHj8V6oh7J8K7v5AxQKbdkvANhGuafTrUUsS8hNSeHjX3rHXUF4drVko4g2rWBq=w215-h322-s-no?authuser=0';
-    $base64Img = \Http::get($data['image'])->body();
-    $ext = pathinfo($data['image'], PATHINFO_EXTENSION) ?? 'jpg';
-    $ext = $ext!=''?$ext:'jpg';
-    $new_file = 'test-truyen'.'.'.$ext;
-    $full_path = 'public/photos/1/images/'.$new_file;
-    Storage::put($full_path, $base64Img);
-    dd($base64Img, $ext, $new_file, Storage::url($full_path));
+    return(new CrawlDataController)->crawlerCategories();
 });
 //****************user*************
     Route::get('/crawler', [CrawlDataController::class, "crawler"])->name("crawler");
@@ -144,9 +137,10 @@ Route::middleware('realtimeLogin')->group(function(){
                 Route::get('/all', [ManagerUsersController::class, "all"])->name("all");
                 Route::post('/add', [ManagerUsersController::class, "add"])->name("add");
                 Route::get('/show/{user}', [ManagerUsersController::class, "show"])->name("show");
-                // Route::patch('/edit/{user}', [ManagerUsersController::class, "edit"])->name("edit");
                 Route::get('/lock/{user}', [ManagerUsersController::class, "lock"])->name("lock");
                 Route::get('/unlock/{user}', [ManagerUsersController::class, "unlock"])->name("unlock");
+                Route::post('/edit', [ManagerUsersController::class, "adminEdit"])->name("adminEdit");
+                Route::post('/edit/{user}', [ManagerUsersController::class, "edit"])->name("edit");
                 Route::delete('/delete/{user}', [ManagerUsersController::class, "delete"])->name("delete");
                 
                 Route::get('/manager-decentralization', [ManagerUsersController::class, "decentralization"])->name("decentralization");

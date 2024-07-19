@@ -1,7 +1,7 @@
 @extends('admins.layout')
 
 @section('css')
-
+<link rel="stylesheet" href="assets/admins/plugins/sweetalert2/sweetalert2.min.css">
 @endsection
 
 @section('content')
@@ -23,6 +23,74 @@
                 </div>
             </div><!-- /.container-fluid -->
         </section>
+
+        <div class="modal fade" id="modal-xl">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="card-header bg-blue">
+                        <h3 class="card-title">Cập nhật người dùng</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <!-- form start -->
+                    <form method="POST" id="formDataUser" action="{{route('admin.users.adminEdit')}}" enctype="multipart/form-data">
+                        @csrf
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Email:</label>
+                                <div class="input-group">
+                                    <input type="text" id="txtemail" class="form-control" readonly>
+                                    <input type="hidden" id="txtID" name="id" value="">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Tên người dùng:</label>
+                                <input type="text" name="fullname" id="txtfullname" class="form-control" placeholder="Nhập tên người dùng">
+                            </div>
+                            <div class="form-group">
+                                <label>Số điện thoại:</label>
+                                <input type="text" id="txtphone" name="phone" class="form-control" placeholder="Nhập số điện thoại">
+                            </div>
+                            <div class="form-group d-flex">
+                                <div class="col-9 m-0 p-0">
+                                    <label>Ảnh đại diện:</label>
+                                    <div class="input-group m-0">
+                                        <div class="custom-file">
+                                            <input type="file" class="custom-file-input" id="txtavatar" name="avatar" id="txtavatar">
+                                            <label class="custom-file-label" for="txtavatar" id="txtnamefile">Chọn ảnh đại diện</label>
+                                        </div>
+                                        <div class="input-group-append">
+                                            <span class="input-group-text">Tải ảnh lên</span>
+                                        </div>
+                                      </div>
+                                </div>
+                                <div class="col-3">
+                                    <img class="ml-3" src="" alt="" id="imgavatar" style="width: 80px; height: 80px; border-radius: 50%;">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Đổi mật khẩu:</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">
+                                            <input  id="check-change-pass" type="checkbox" title="Checked để đổi mật khẩu">
+                                        </span>
+                                    </div>
+                                    <input type="password" id="txtpassword" class="form-control" title="Nhập mật khẩu mật khẩu" disabled>
+                                    <button style="border: 1px solid #6c757d; background: none; color: white; border-radius: 0 .25rem .25rem 0;" id="show-pass" data-open="false"><i class="fas fa-eye-slash"></i></button>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </form>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+                        <button type="submit" class="btn btn-primary" form="formDataUser">Cập nhật</button>
+                    </div>
+                </div>
+              <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
 
         <!-- Main content -->
         <section class="content">
@@ -89,6 +157,7 @@
 @endsection
 
 @section('js')
+<script src="assets/admins/plugins/sweetalert2/sweetalert2.all.min.js"></script>
 <script>
     var page = 1;
     function getData() {
@@ -196,6 +265,12 @@
                         </div>
                         <div class="card-footer">
                             <div class="text-right">
+                                <a href="javascript:void(0)" onclick="editUser(${user.id});" class="btn btn-sm btn-warning">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="javascript:void(0)" onclick="deleteUser(${user.id});" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-times"></i>
+                                </a>
                                 <a href="admin/users/show/${user.id}" class="btn btn-sm btn-primary">
                                     <i class="fas fa-user"></i> Xem thông tin
                                 </a>
@@ -222,5 +297,94 @@
         }
         return full_text_time+' trước';
     }
+    $('#check-change-pass').change(function (e) { 
+        e.preventDefault();
+        let open = $(this).is(':checked');
+        $('#txtpassword').prop('disabled', !open);
+    });
+    $('#show-pass').click(function (e) { 
+        e.preventDefault();
+        let open = $(this).attr('data-open');
+        if(open == 'false'){
+            $(this).html('<i class="fas fa-eye"></i>');
+            $('#txtpassword').attr('type', 'text');
+            $(this).attr('data-open', 'true');
+        }else{
+            $(this).html('<i class="fas fa-eye-slash"></i>');
+            $('#txtpassword').attr('type', 'password');
+            $(this).attr('data-open', 'false');
+        }
+    });
+    function editUser(id){
+        $.ajax({
+            type: "GET",
+            url: `admin/users/show/${id}`,
+            data: {},
+            success: function (response) {
+                $('#txtID').val(response.id);
+                $('#txtemail').val(response.email);
+                $('#txtfullname').val(response.fullname);
+                $('#txtphone').val(response.phone);
+                $('#imgavatar').attr('src',response.avatar);
+                $('#txtavatar').val('');
+                $('#modal-xl').modal('show');
+                // console.log(response);
+            }
+        });
+    }
+    $('#formDataUser').submit(function (e) { 
+        e.preventDefault();
+        var formData = new FormData();
+        formData.append('fullname', $('#txtfullname').val());
+        formData.append('phone', $('#txtphone').val());
+        formData.append('avatar', $('#txtavatar')[0].files[0]);
+        formData.append('_token', '{{csrf_token()}}');
+        if($('#check-change-pass').is(':checked')){
+            formData.append('password', $('#txtpassword').val());
+        }
+        $.ajax({
+            type: "POST",
+            url: `admin/users/edit/${$('#txtID').val()}`,
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if(response.success){
+                    $('#modal-xl').modal('hide');
+                    loadContacts();
+                }
+                Swal.fire(response.msg, "", response.type);
+            }
+        });
+    });
+    function deleteUser(id){
+        $.ajax({
+            type: "DELETE",
+            url: `admin/users/delete/${id}`,
+            data: {
+                _token: '{{csrf_token()}}',
+            },
+            success: function (response) {
+                if(response.success){
+                    loadContacts();
+                }
+                Swal.fire(response.msg, "", response.type);
+            }
+        });
+    }
+    $('#txtavatar').change(function (e) { 
+        e.preventDefault();
+        if($(this).val()){
+            var reader  = new FileReader();
+            reader.onloadend = function () {
+                $('#imgavatar').attr('src', reader.result);
+            }
+            if (e.target.files[0]) {
+                $('#txtnamefile').html(e.target.files[0].name);
+                // console.log(e.target.files[0].name);
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        }
+    });
 </script>
 @endsection

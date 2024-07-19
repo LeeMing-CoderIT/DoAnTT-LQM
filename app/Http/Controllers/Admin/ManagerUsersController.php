@@ -87,23 +87,23 @@ class ManagerUsersController extends Controller
         return response()->json($response);
     }
 
-    public function edit(Request $request)
+    public function edit(Request $request, User $user)
     {
-        $user = User::find((int)$request->iduser);
         $response = []; $response['success'] = false; $response['msg'] = 'Cập nhật thất bại.';$response['type'] = 'error';
-        $data = $request->only('fullname', 'avatar', 'phone', 'password');
-        // dd($data,$user);
         try {
-            if($data['avatar'] == '/storage/photos/3/local/vo-danh.jpg'){
-                $data['avatar'] = null;
-            }else{
-                $data['avatar'] = explode('storage/images/users/', $data['avatar'])[1];
-            }
-            if($request->has('password')){
-                $data['password'] = bcrypt($data['password']);
-            }
+            $data = $request->only('fullname', 'phone');
             if(\Auth::user()->root==1 || \Auth::user()->id == $user->id){
-                $user->update($data);
+                if($user){
+                    if($request->has('password')){
+                        $data['password'] = bcrypt($request->password);
+                    }
+                    if($request->avatar){
+                        $data['avatar'] = time().'_'.$request->avatar->getClientOriginalName();
+                        $request->avatar->move(public_path('storage/images/users'), $data['avatar']);
+                        Storage::delete('public/images/users/'.$user->avatar);
+                    }
+                    $user->update($data);
+                }
                 $response['success'] = true;
                 $response['data'] = $data;
                 $response['type'] = 'success';
@@ -117,6 +117,23 @@ class ManagerUsersController extends Controller
         }
         return back()->with('type', $response['type'])
         ->with('msg', $response['msg']);;
+    }
+
+    public function adminEdit(Request $request)
+    {
+        $user = User::find($request->id);
+        $data = $request->only('fullname', 'phone');
+        if($user){
+            if($request->avatar){
+                $data['avatar'] = time().'_'.$request->avatar->getClientOriginalName();
+                $request->avatar->move(public_path('storage/images/users'), $data['avatar']);
+                Storage::delete('public/images/users/'.$user->avatar);
+            }
+            $user->update($data);
+            // dd($request->all(), $user);
+            return back()->with('msg', 'Cập nhật thành công.')->with('type', 'success');
+        }
+        return back()->with('msg', 'Tài khoản không tồn tại.')->with('type', 'danger');
     }
 
     public function unlock(Request $request, User $user)
@@ -163,7 +180,7 @@ class ManagerUsersController extends Controller
 
     public function delete(User $user)
     {
-        $response = []; $response['success'] = false; $response['msg'] = 'Xóa dữ liệu thất bại.';$response['type'] = 'error';
+        $response = []; $response['success'] = false; $response['msg'] = 'Xóa người dùng thất bại.';$response['type'] = 'error';
         try {
             if(\Auth::user()->root==1){
                 if($user->delete()){
@@ -171,7 +188,7 @@ class ManagerUsersController extends Controller
                     $response['success'] = true;
                     $response['data'] = $user;
                     $response['type'] = 'success';
-                    $response['msg'] = 'Xóa thành công.';
+                    $response['msg'] = 'Xóa người dùng thành công.';
                 }
             }else{
                 $response['msg'] = 'Không có quyền hạn.';
