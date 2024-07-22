@@ -66,23 +66,39 @@ class HelpperController extends Controller
     }
 
     public function tranlateToMP3_2(Request $request){
+        [
+            [
+                'first' => ''
+            ]
+        ];
         $text = $request->text;
         $this->renderStr($text, $arr_data);
 
-        $full_data = '';
-        if($arr_data && is_array($arr_data)){
-            foreach($arr_data as $data_str){
-                $data_str = rawurlencode(htmlspecialchars($data_str));
-                $url = 'https://translate.google.com/translate_tts?ie=UTF-8&tl='.$this->language.'&client=tw-ob&q='.$data_str;
-                $full_data .= base64_encode(Http::get($url));
+        try {
+            $full_data = '';
+            if($arr_data && is_array($arr_data)){
+                foreach($arr_data as $data_str){
+                    $data_str = rawurlencode(htmlspecialchars($data_str));
+                    $url = 'https://translate.google.com/translate_tts?ie=UTF-8&tl='.$this->language.'&client=tw-ob&q='.$data_str;
+                    $full_data .= base64_encode(Http::get($url));
+                }
             }
+            $response = [
+                'success' => true,
+                'text' => $arr_data,
+                'data' => $full_data,
+                'token'=> $request->token,
+                'index' => $request->index,
+            ];
+        } catch (\Throwable $th) {
+            $response = [
+                'success' => false,
+                'text' => 'Hệ thống nghe đang lỗi tải dữ liệu. Vui lòng kiểm tra mạng kết nối, và báo cáo với quản trị viên.',
+                'data' => $full_data,
+                'token'=> $request->token,
+                'index' => $request->index,
+            ];
         }
-        $response = [
-            'text' => $arr_data,
-            'data' => $full_data,
-            'token'=> $request->token,
-            'index' => $request->index,
-        ];
         // dd($response);
         return response()->json($response);
     }

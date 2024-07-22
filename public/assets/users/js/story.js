@@ -106,6 +106,33 @@ function loadStoryTop(id){
         }
     });
 }
+var playReview = false;
+const sound = document.getElementById('sound-review');
+$('#btn-show-review').click(function (e) { 
+    e.preventDefault();
+    playReview = !playReview;
+    if(playReview){
+        sound.load();
+        sound.play();
+    }else{
+        sound.pause();
+    }
+});
+
+// console.log($('#txtdescription').text());
+$.ajax({
+    type: "get",
+    url: "/tranlateToMP3",
+    data: {
+        text: $('#txtdescription').text(),
+        token: '',
+        index: 0,
+    },
+    success: function (response) {
+        $('#btn-show-review').removeClass('d-none');
+        sound.src = 'data:audio/mpeg;base64,'+response.data;
+    }
+});
 
 function loadChapters(page = 1) {
     page = Number(page);

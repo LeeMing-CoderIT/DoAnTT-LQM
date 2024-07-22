@@ -10,13 +10,15 @@
     <div class="container">
         <div class="row align-items-start">
             <div class="col-12 col-md-7 col-lg-8">
-                <div class="head-title-global d-flex justify-content-between mb-4">
+                <div class="head-title-global d-flex justify-content-between mb-4 justify-content-center">
                     <div class="col-12 col-md-12 col-lg-4 head-title-global__left d-flex">
                         <h2 class="me-2 mb-0 border-bottom border-secondary pb-1">
                             <span class="d-block text-decoration-none text-dark fs-4 title-head-name"
                                 title="Thông tin truyện">Thông tin truyện</span>
                         </h2>
                     </div>
+                    <button class="d-none" style="border: none; background: none; color: white;" id="btn-show-review"><i class="fa-solid fa-volume-high"></i></button>
+                    <audio id="sound-review"></audio>
                 </div>
 
                 <div class="story-detail">
@@ -49,7 +51,7 @@
                                     </div>
                                 </div>
 
-                                <div class="story-detail__top--desc px-3" style="max-height: 285px;">
+                                <div class="story-detail__top--desc px-3" style="max-height: 285px;" id="txtdescription">
                                     {!! ($story_info->description) !!}
                                 </div>
 

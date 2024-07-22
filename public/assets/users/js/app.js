@@ -387,5 +387,3 @@ function renderTime(miliseconds) {
 }));
 
 
-
-

@@ -32,16 +32,21 @@ const app = {
                             index: index,
                         },
                         success: function (response) {
-                            if(response.token == __token){
-                                if(_this.loading === false){
-                                    _this.continue = false
-                                    console.log('dừng');
-                                }else{
-                                    _this.notMP3Loanging.splice(_this.notMP3Loanging.indexOf(index), 1);
-                                    _this.mp3[index] = response.data;
-                                    index = Number(index) + _this.loadingxSpeech;
-                                    _this.loadMP3(index);
+                            if (response.success) {
+                                if(response.token == __token){
+                                    if(_this.loading === false){
+                                        _this.continue = false
+                                        console.log('dừng');
+                                    }else{
+                                        _this.notMP3Loanging.splice(_this.notMP3Loanging.indexOf(index), 1);
+                                        _this.mp3[index] = response.data;
+                                        index = Number(index) + _this.loadingxSpeech;
+                                        _this.loadMP3(index);
+                                    }
                                 }
+                            } else {
+                                $('#controlls-box').hide();
+                                Swal.fire(response.text, "", 'warning');
                             }
                         }
                     });

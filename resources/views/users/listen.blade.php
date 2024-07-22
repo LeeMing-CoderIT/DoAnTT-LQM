@@ -2,6 +2,7 @@
 
 @section('css')
 <link rel="stylesheet" href="assets/users/css/listen.css">
+<link rel="stylesheet" href="assets/admins/plugins/sweetalert2/sweetalert2.min.css">
 @endsection
 
 @section('content')
@@ -48,7 +49,7 @@
         </div>
     </div>
 
-    <div class="box-controls position-fixed bottom-0 w-100 p-3 d-flex flex-column align-self-center justify-content-center">
+    <div class="box-controls position-fixed bottom-0 w-100 p-3 d-flex flex-column align-self-center justify-content-center" id="controlls-box">
         <div class="d-flex justify-content-center align-items-center gap-1">
             <div class="number-range" id="currentProgress">1</div>
             <div class="col-10 col-lg-6">
@@ -79,4 +80,5 @@
 
 @section('js')
 <script src="assets/users/js/listen.js"></script>
+<script src="assets/admins/plugins/sweetalert2/sweetalert2.all.min.js"></script>
 @endsection

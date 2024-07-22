@@ -64,7 +64,7 @@ class ManagerStoriesController extends Controller
         try {
             if(Story::where('slug', $request->slug)->first()) {
                 $response['msg'] = [
-                    'type'=>'error', 'msg'=>'Đường dẫn nguồn truyện đã tồn tại.'
+                    'type'=>'error', 'msg'=>'Truyện đã tồn tại trên hệ thống.'
                 ];
             }
             else{

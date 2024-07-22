@@ -358,17 +358,27 @@
         });
     });
     function deleteUser(id){
-        $.ajax({
-            type: "DELETE",
-            url: `admin/users/delete/${id}`,
-            data: {
-                _token: '{{csrf_token()}}',
-            },
-            success: function (response) {
-                if(response.success){
-                    loadContacts();
-                }
-                Swal.fire(response.msg, "", response.type);
+        Swal.fire({
+            title: "Bạn có chắc chắn muốn xóa không?",
+            showCancelButton: true,
+            confirmButtonText: "Xác nhận",
+            cancelButtonText: "Hủy",
+            icon: "question",
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    type: "DELETE",
+                    url: `admin/users/delete/${id}`,
+                    data: {
+                        _token: '{{csrf_token()}}',
+                    },
+                    success: function (response) {
+                        if(response.success){
+                            loadContacts();
+                        }
+                        Swal.fire(response.msg, "", response.type);
+                    }
+                });
             }
         });
     }

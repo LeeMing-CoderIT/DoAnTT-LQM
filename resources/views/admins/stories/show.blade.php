@@ -189,7 +189,7 @@
                             <div class="card-body">
                                 <form method="POST" id="formDataStory">
                                     <div class="form-group">
-                                        <label>Nguồn truyện: <span style="font-weight: normal;">{{$story->source['source'].' - '.$story->source['link']}}</span></label>
+                                        <label>Nguồn truyện: <span style="font-weight: normal;">{{$story->source?$story->source['source'].' - '.$story->source['link']:'<không cớ>'}}</span></label>
                                     </div>
                                     <div class="form-group">
                                         <label>Tên tác giả: <span class="show-view" id="lbauthor" style="font-weight: normal;"></span></label>
